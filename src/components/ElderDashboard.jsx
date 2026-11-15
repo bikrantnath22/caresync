@@ -136,7 +136,23 @@ export default function ElderDashboard() {
 
       try {
         window.speechSynthesis.cancel();
+
+        // On mobile browsers, resume speech synthesis if in suspended state
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+
         const utterance = new SpeechSynthesisUtterance(text);
+
+        // Mobile Chrome Garbage Collection Fix: prevent cutting off mid-speech
+        window._activeSpeechUtterance = utterance;
+        utterance.onend = () => {
+          window._activeSpeechUtterance = null;
+        };
+        utterance.onerror = () => {
+          window._activeSpeechUtterance = null;
+        };
+
         const isHindiText =
           forceHindi !== null ? forceHindi : /[\u0900-\u097F]/.test(text);
 
@@ -387,6 +403,18 @@ export default function ElderDashboard() {
     }
 
     try {
+      // Prime mobile speech synthesis within the user tap event to unlock mobile autoplay policies
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        try {
+          window.speechSynthesis.resume();
+          const primeUtterance = new SpeechSynthesisUtterance("");
+          primeUtterance.volume = 0;
+          window.speechSynthesis.speak(primeUtterance);
+        } catch {
+          // ignore priming errors
+        }
+      }
+
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
@@ -447,6 +475,12 @@ export default function ElderDashboard() {
             speechLang.startsWith("hi")
               ? "कोई आवाज़ नहीं सुनाई दी। कृपया दोबारा माइक दबाकर बोलें।"
               : "No speech detected. Please tap the mic and try speaking again."
+          );
+        } else if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+          setVoiceStatusNotice(
+            speechLang.startsWith("hi")
+              ? "माइक्रोफ़ोन अवरुद्ध है। यदि आप लिंक्डइन या ऐप के अंदर हैं, तो ऊपर 3 डॉट्स दबाकर 'Chrome में खोलें' चुनें।"
+              : "Microphone blocked. If you are inside LinkedIn or another app, tap (⋮) and select 'Open in Chrome' or 'Open in Safari'."
           );
         } else {
           setVoiceStatusNotice(
