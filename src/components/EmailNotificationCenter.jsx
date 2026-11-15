@@ -444,24 +444,41 @@ export default function EmailNotificationCenter() {
 
                   {/* If email mentions refill links or lowStock, render interactive 1-click pill reorder button */}
                   {email.body?.includes("pharmacy.caresync.ai/refill") && (
-                    <div className="pt-2 flex flex-wrap items-center gap-2">
-                      <span className="text-[11px] font-bold text-amber-300 flex items-center gap-1">
-                        <AlertTriangle className="w-3.5 h-3.5" aria-hidden="true" />
-                        1-Click Refill Action Available:
-                      </span>
-                      {lowStockMedications.map((m) => (
-                        <button
-                          key={m.id}
-                          id={`btn-order-refill-${email.id}-${m.id}`}
-                          type="button"
-                          aria-label={`Order Refill for ${m.name}, restock 30 pills`}
-                          onClick={() => handle1ClickRefill(m.id)}
-                          className="px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-xs font-bold transition flex items-center gap-1 active:scale-95"
-                        >
-                          <ExternalLink className="w-3 h-3" aria-hidden="true" />
-                          Order Refill: {m.name} (+30 pills)
-                        </button>
-                      ))}
+                    <div className="mt-3 p-3.5 rounded-xl bg-gradient-to-r from-amber-50 via-orange-50/70 to-amber-50 border border-amber-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-2 rounded-xl bg-amber-100/90 text-amber-800 border border-amber-200 shrink-0">
+                          <AlertTriangle className="w-4 h-4 text-amber-700" aria-hidden="true" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                            1-Click Pharmacy Refill Available
+                            <span className="px-1.5 py-0.5 rounded-md bg-amber-200/80 text-amber-900 text-[10px] font-extrabold uppercase">
+                              Low Stock
+                            </span>
+                          </p>
+                          <p className="text-[11px] text-amber-800 font-medium">
+                            Critically low medication stock detected in dispenser
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 shrink-0">
+                        {lowStockMedications.map((m) => (
+                          <button
+                            key={m.id}
+                            id={`btn-order-refill-${email.id}-${m.id}`}
+                            type="button"
+                            aria-label={`Order Refill for ${m.name}, restock 30 pills`}
+                            onClick={() => handle1ClickRefill(m.id)}
+                            className="px-3.5 py-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-xl text-xs font-bold shadow-sm shadow-amber-600/25 transition flex items-center gap-1.5 active:scale-95 border border-amber-700/30"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5 text-white/90" aria-hidden="true" />
+                            <span>Order Refill: {m.name}</span>
+                            <span className="px-1.5 py-0.5 rounded-md bg-white/20 text-white text-[10px] font-black uppercase tracking-wider">
+                              +30 pills
+                            </span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </article>
