@@ -20,11 +20,11 @@ import { hasCloudConsent } from "../utils/security.js";
  * models page (e.g. gemini-2.5-flash or gemini-2.0-flash). Re-check model availability
  * periodically at https://ai.google.dev/models.
  */
-const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
-const FALLBACK_GEMINI_MODEL = "gemini-2.0-flash";
+const DEFAULT_GEMINI_MODEL = "gemini-2.0-flash";
+const FALLBACK_GEMINI_MODEL = "gemini-1.5-flash";
 
 /**
- * Safely retrieves Gemini model name (defaults to current stable gemini-2.5-flash).
+ * Safely retrieves Gemini model name (defaults to current stable gemini-2.0-flash).
  * @returns {string}
  */
 function getGeminiModel() {
@@ -350,8 +350,8 @@ Return STRICT valid JSON ONLY matching:
 
     if (isMultimodal) {
       parts.push({
-        inline_data: {
-          mime_type: fileData.mimeType || "image/jpeg",
+        inlineData: {
+          mimeType: fileData.mimeType || "image/jpeg",
           data: fileData.base64Data,
         },
       });
@@ -379,34 +379,43 @@ Return STRICT valid JSON ONLY matching:
       if (!response.ok && primaryModel !== FALLBACK_GEMINI_MODEL) {
         response = await callGemini(FALLBACK_GEMINI_MODEL, payload, 20000);
       }
-    } catch {
-      // Graceful deterministic fallback per SPEC.md: app never fails or halts on cloud/network error
-      const fallback = getPrescriptionFallback();
-      const ruleWarnings = evaluateInteractionRules(
-        fallback.extractedMedications,
-        existingMedications,
-        elderProfile
-      );
-      fallback.interactionWarnings = mergeInteractionWarnings(
-        fallback.interactionWarnings,
-        ruleWarnings
-      );
-      return fallback;
+    } catch (err) {
+      if (isSample) {
+        const fallback = getPrescriptionFallback();
+        const ruleWarnings = evaluateInteractionRules(
+          fallback.extractedMedications,
+          existingMedications,
+          elderProfile
+        );
+        fallback.interactionWarnings = mergeInteractionWarnings(
+          fallback.interactionWarnings,
+          ruleWarnings
+        );
+        return fallback;
+      }
+      throw err;
     }
 
     if (!response || !response.ok) {
-      // Graceful deterministic fallback: if Gemini returns 404/503/429 or proxy unreachable
-      const fallback = getPrescriptionFallback();
-      const ruleWarnings = evaluateInteractionRules(
-        fallback.extractedMedications,
-        existingMedications,
-        elderProfile
-      );
-      fallback.interactionWarnings = mergeInteractionWarnings(
-        fallback.interactionWarnings,
-        ruleWarnings
-      );
-      return fallback;
+      if (isSample) {
+        const fallback = getPrescriptionFallback();
+        const ruleWarnings = evaluateInteractionRules(
+          fallback.extractedMedications,
+          existingMedications,
+          elderProfile
+        );
+        fallback.interactionWarnings = mergeInteractionWarnings(
+          fallback.interactionWarnings,
+          ruleWarnings
+        );
+        return fallback;
+      }
+      const errData = await response.json().catch(() => ({}));
+      const errMsg =
+        errData?.error?.message ||
+        errData?.error ||
+        `Google Gemini OCR returned HTTP status ${response?.status || "error"}`;
+      throw new Error(errMsg);
     }
 
     const data = await response.json();
@@ -417,17 +426,22 @@ Return STRICT valid JSON ONLY matching:
         rawText.replace(/\`\`\`json/gi, "").replace(/\`\`\`/g, "").trim()
       );
     } catch {
-      const fallback = getPrescriptionFallback();
-      const ruleWarnings = evaluateInteractionRules(
-        fallback.extractedMedications,
-        existingMedications,
-        elderProfile
+      if (isSample) {
+        const fallback = getPrescriptionFallback();
+        const ruleWarnings = evaluateInteractionRules(
+          fallback.extractedMedications,
+          existingMedications,
+          elderProfile
+        );
+        fallback.interactionWarnings = mergeInteractionWarnings(
+          fallback.interactionWarnings,
+          ruleWarnings
+        );
+        return fallback;
+      }
+      throw new Error(
+        "Unable to parse prescription details from the uploaded image. Please ensure the document is clear and legible."
       );
-      fallback.interactionWarnings = mergeInteractionWarnings(
-        fallback.interactionWarnings,
-        ruleWarnings
-      );
-      return fallback;
     }
 
     if (

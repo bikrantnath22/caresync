@@ -55,11 +55,13 @@ function geminiDevProxyPlugin() {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  if (env.GEMINI_API_KEY) {
-    process.env.GEMINI_API_KEY = env.GEMINI_API_KEY;
+  const key = env.GEMINI_API_KEY || env.VITE_GEMINI_API_KEY;
+  if (key) {
+    process.env.GEMINI_API_KEY = key;
   }
-  if (env.GEMINI_MODEL) {
-    process.env.GEMINI_MODEL = env.GEMINI_MODEL;
+  const model = env.GEMINI_MODEL || env.VITE_GEMINI_MODEL;
+  if (model) {
+    process.env.GEMINI_MODEL = model;
   }
 
   return {

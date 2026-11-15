@@ -36,10 +36,12 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed. Use POST." });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey =
+    process.env.GEMINI_API_KEY ||
+    process.env.VITE_GEMINI_API_KEY;
   if (!apiKey || apiKey === "your_gemini_api_key_here") {
     return res.status(503).json({
-      error: "Server configuration error: GEMINI_API_KEY is not configured on the server.",
+      error: "Server configuration error: GEMINI_API_KEY is not configured on the server. Please add GEMINI_API_KEY in your environment variables.",
     });
   }
 
@@ -47,18 +49,16 @@ export default async function handler(req, res) {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
     const { model, payload } = body || {};
 
-    // Validate target model against allow-list
-    const targetModel = (
+    // Validate target model against allow-list or fallback to stable gemini-2.0-flash
+    let targetModel = (
       model ||
       process.env.GEMINI_MODEL ||
-      "gemini-2.5-flash"
+      process.env.VITE_GEMINI_MODEL ||
+      "gemini-2.0-flash"
     ).trim();
 
     if (!ALLOWED_MODELS.has(targetModel)) {
-      return res.status(400).json({
-        error: `Model "${targetModel}" is not in the approved allow-list.`,
-        allowedModels: Array.from(ALLOWED_MODELS),
-      });
+      targetModel = "gemini-2.0-flash";
     }
 
     if (!payload || typeof payload !== "object") {
