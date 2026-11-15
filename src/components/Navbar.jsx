@@ -16,10 +16,12 @@ import {
   AlertTriangle,
   Cloud,
   CloudOff,
+  HelpCircle,
 } from "lucide-react";
 import { useCare } from "../context/CareContext";
 import PasscodeGate from "./PasscodeGate";
 import ConsentModal from "./ConsentModal";
+import PinInstructionModal from "./PinInstructionModal";
 import { isDemoMode, getStoredConsent } from "../utils/security";
 
 export default function Navbar() {
@@ -34,6 +36,7 @@ export default function Navbar() {
 
   const [isPasscodeModalOpen, setIsPasscodeModalOpen] = useState(false);
   const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
+  const [isPinInstructionsOpen, setIsPinInstructionsOpen] = useState(false);
   const [consentStatus, setConsentStatus] = useState(() => getStoredConsent());
 
   // Role badges configuration (Light Theme)
@@ -215,6 +218,19 @@ export default function Navbar() {
             <span className="lg:hidden">PIN</span>
           </button>
 
+          {/* PIN Instructions / Passcode Guide Button */}
+          <button
+            id="btn-pin-instructions"
+            type="button"
+            aria-label="Role Passcode Instructions, view demo PINs for Elder, Caretaker, and Family"
+            onClick={() => setIsPinInstructionsOpen(true)}
+            title="View Role PIN Passcodes (Elder 1111, Caretaker 2222, Family 3333)"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 hover:text-indigo-900 text-xs font-bold rounded-xl border border-indigo-200 transition active:scale-95 shadow-sm"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-indigo-600" aria-hidden="true" />
+            <span className="hidden xl:inline">PIN Guide</span>
+          </button>
+
           {/* Reset Demo Data */}
           <button
             id="btn-reset-demo"
@@ -233,6 +249,13 @@ export default function Navbar() {
       <PasscodeGate
         isOpen={isPasscodeModalOpen}
         onClose={() => setIsPasscodeModalOpen(false)}
+      />
+
+      {/* Role Passcode Instructions Guide Modal */}
+      <PinInstructionModal
+        isOpen={isPinInstructionsOpen}
+        onClose={() => setIsPinInstructionsOpen(false)}
+        onOpenKeypad={() => setIsPasscodeModalOpen(true)}
       />
 
       {/* Accessible Cloud AI Consent Preferences Modal */}
