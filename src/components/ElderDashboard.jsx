@@ -608,8 +608,10 @@ export default function ElderDashboard() {
         if (snoozedUntil[slotKey] && Date.now() < snoozedUntil[slotKey]) continue;
 
         const slotMin = parseSlotToMinutes(slot);
-        // A dose is strictly due ONLY within 15 minutes before scheduled slot or overdue!
-        if (nowMinutes >= slotMin - 15) {
+        // A dose reminder is active strictly within 15 minutes before the slot and up to 120 minutes (2 hours) after.
+        // Beyond 2 hours, the slot is an overdue missed dose (escalated via email) so that an 8 AM morning pill
+        // is never mistakenly shown as "Time to take your pill" at 6 PM in the evening!
+        if (nowMinutes >= slotMin - 15 && nowMinutes <= slotMin + 120) {
           dueNowList.push({
             med,
             slot,
