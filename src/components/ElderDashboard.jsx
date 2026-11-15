@@ -54,7 +54,7 @@ export default function ElderDashboard() {
   } = useCare();
 
   const [isListening, setIsListening] = useState(false);
-  const [speechLang, setSpeechLang] = useState("hi-IN"); // "hi-IN" | "en-IN"
+  const [speechLang, setSpeechLang] = useState("en-IN"); // "en-IN" (default) | "hi-IN"
   const [voiceTranscript, setVoiceTranscript] = useState("");
   const [voiceFeedback, setVoiceFeedback] = useState(null);
   const [voiceStatusNotice, setVoiceStatusNotice] = useState("");
@@ -1116,21 +1116,8 @@ export default function ElderDashboard() {
                 Zero-UI Voice Assistant
               </span>
 
-              {/* Language Selection Toggle */}
+              {/* Language Selection Toggle: English (default) first, Hindi second */}
               <div className="flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200 text-base shadow-inner">
-                <button
-                  id="btn-lang-hindi"
-                  type="button"
-                  aria-label="हिंदी (Hindi), switch voice assistant to Hindi"
-                  onClick={() => setSpeechLang("hi-IN")}
-                  className={`px-3.5 py-1.5 rounded-xl font-bold text-base transition flex items-center gap-1.5 ${speechLang === "hi-IN"
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "text-slate-600 hover:text-slate-900"
-                    }`}
-                >
-                  <Globe className="w-4 h-4" aria-hidden="true" />
-                  <span lang="hi">हिंदी (Hindi)</span>
-                </button>
                 <button
                   id="btn-lang-english"
                   type="button"
@@ -1143,6 +1130,19 @@ export default function ElderDashboard() {
                 >
                   <Globe className="w-4 h-4" aria-hidden="true" />
                   English
+                </button>
+                <button
+                  id="btn-lang-hindi"
+                  type="button"
+                  aria-label="हिंदी (Hindi), switch voice assistant to Hindi"
+                  onClick={() => setSpeechLang("hi-IN")}
+                  className={`px-3.5 py-1.5 rounded-xl font-bold text-base transition flex items-center gap-1.5 ${speechLang === "hi-IN"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-slate-600 hover:text-slate-900"
+                    }`}
+                >
+                  <Globe className="w-4 h-4" aria-hidden="true" />
+                  <span lang="hi">हिंदी (Hindi)</span>
                 </button>
               </div>
             </div>
