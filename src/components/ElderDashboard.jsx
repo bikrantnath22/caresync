@@ -135,16 +135,70 @@ export default function ElderDashboard() {
       }
 
       try {
-        window.speechSynthesis.cancel();
-
-        // On mobile browsers, resume speech synthesis if in suspended state
-        if (window.speechSynthesis.paused) {
-          window.speechSynthesis.resume();
+        // Cancel previous speech if actively speaking
+        if (window.speechSynthesis.speaking) {
+          window.speechSynthesis.cancel();
         }
 
-        const utterance = new SpeechSynthesisUtterance(text);
+        const isHindiText =
+          forceHindi !== null ? forceHindi : /[\u0900-\u097F]/.test(text);
 
-        // Mobile Chrome Garbage Collection Fix: prevent cutting off mid-speech
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = isHindiText ? "hi-IN" : "en-IN";
+
+        // Critical for Mobile: Use natural speed 1.0 (rates < 1.0 trigger robotic DSP distortion on phones)
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+
+        const voices =
+          availableVoices.length > 0
+            ? availableVoices
+            : (window.speechSynthesis.getVoices?.() || []);
+
+        if (voices && voices.length > 0) {
+          let chosenVoice = null;
+          if (isHindiText) {
+            // Find natural/neural Hindi voice
+            chosenVoice =
+              voices.find(
+                (v) =>
+                  (v.lang?.toLowerCase().includes("hi") || v.name?.toLowerCase().includes("hindi")) &&
+                  (v.name.toLowerCase().includes("google") || v.name.toLowerCase().includes("natural") || !v.localService)
+              ) ||
+              voices.find(
+                (v) =>
+                  v.lang?.toLowerCase().includes("hi") ||
+                  v.name?.toLowerCase().includes("hindi")
+              );
+          } else {
+            // Find natural/neural Indian English voice first, then clean English voice
+            chosenVoice =
+              voices.find(
+                (v) =>
+                  (v.lang?.toLowerCase().replace("_", "-").includes("en-in") || v.name?.toLowerCase().includes("india")) &&
+                  (v.name.toLowerCase().includes("google") || v.name.toLowerCase().includes("natural") || !v.localService)
+              ) ||
+              voices.find(
+                (v) =>
+                  v.lang?.toLowerCase().replace("_", "-").includes("en-in") ||
+                  v.name?.toLowerCase().includes("india") ||
+                  v.name?.includes("Heera") ||
+                  v.name?.includes("Ravi")
+              ) ||
+              voices.find(
+                (v) =>
+                  v.name.toLowerCase().includes("google") ||
+                  v.name.toLowerCase().includes("natural")
+              ) ||
+              voices.find((v) => v.lang?.toLowerCase().startsWith("en"));
+          }
+
+          if (chosenVoice) {
+            utterance.voice = chosenVoice;
+          }
+        }
+
+        // Garbage collection protection for mobile
         window._activeSpeechUtterance = utterance;
         utterance.onend = () => {
           window._activeSpeechUtterance = null;
@@ -153,61 +207,17 @@ export default function ElderDashboard() {
           window._activeSpeechUtterance = null;
         };
 
-        const isHindiText =
-          forceHindi !== null ? forceHindi : /[\u0900-\u097F]/.test(text);
-
-        const voices =
-          availableVoices.length > 0
-            ? availableVoices
-            : window.speechSynthesis.getVoices();
-
-        let chosenVoice = null;
-        if (isHindiText) {
-          // Look for native Hindi voices or Indian locale voices
-          chosenVoice =
-            voices.find(
-              (v) =>
-                v.lang.toLowerCase().includes("hi") ||
-                v.name.toLowerCase().includes("hindi")
-            ) ||
-            voices.find(
-              (v) =>
-                v.lang === "en-IN" ||
-                v.name.includes("India") ||
-                v.lang.includes("IN")
-            ) ||
-            voices.find((v) => v.lang.startsWith("en"));
-
-          utterance.lang = chosenVoice ? chosenVoice.lang : "hi-IN";
-          utterance.rate = 0.90;
-        } else {
-          // Look for Indian English voice first, then natural English voices
-          chosenVoice =
-            voices.find(
-              (v) =>
-                v.lang === "en-IN" ||
-                v.name.includes("India") ||
-                v.name.includes("Heera") ||
-                v.name.includes("Ravi")
-            ) ||
-            voices.find(
-              (v) =>
-                v.name.includes("Natural") ||
-                v.name.includes("Online") ||
-                v.name.includes("Google")
-            ) ||
-            voices.find((v) => v.lang.startsWith("en"));
-
-          utterance.lang = chosenVoice ? chosenVoice.lang : "en-IN";
-          utterance.rate = 0.92;
-        }
-
-        if (chosenVoice) {
-          utterance.voice = chosenVoice;
-        }
-
-        utterance.pitch = 1.0;
-        window.speechSynthesis.speak(utterance);
+        // 60ms delay ensures Android TTS audio HAL finishes resetting and never cuts off the speech
+        setTimeout(() => {
+          try {
+            if (window.speechSynthesis.paused) {
+              window.speechSynthesis.resume();
+            }
+            window.speechSynthesis.speak(utterance);
+          } catch {
+            // speech blocked or unsupported
+          }
+        }, 60);
       } catch {
         // speech blocked or unsupported
       }
@@ -388,7 +398,7 @@ export default function ElderDashboard() {
         ? "वॉइस स्पीच प्रोसेसिंग गूगल क्लाउड का उपयोग करती है। कृपया सेटिंग्स में क्लाउड एआई सक्षम करें।"
         : "Voice speech processing uses Google Cloud services. Please enable Cloud AI in settings to use live voice.";
       setVoiceStatusNotice(msg);
-      speakFeedback(msg, speechLang);
+      speakText(msg, speechLang.startsWith("hi"));
       return;
     }
 
@@ -403,15 +413,14 @@ export default function ElderDashboard() {
     }
 
     try {
-      // Prime mobile speech synthesis within the user tap event to unlock mobile autoplay policies
+      // Resume speech synthesis within user gesture to unlock mobile audio context
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
         try {
-          window.speechSynthesis.resume();
-          const primeUtterance = new SpeechSynthesisUtterance("");
-          primeUtterance.volume = 0;
-          window.speechSynthesis.speak(primeUtterance);
+          if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
         } catch {
-          // ignore priming errors
+          // ignore resume errors
         }
       }
 
@@ -455,6 +464,13 @@ export default function ElderDashboard() {
       };
 
       recognition.onresult = (event) => {
+        // Stop recognition immediately so the mobile phone releases the microphone and un-mutes the speaker
+        try {
+          recognition.stop();
+        } catch {
+          // ignore error on stop
+        }
+
         const resultList = event.results[0];
         const alternatives = [];
         for (let i = 0; i < resultList.length; i++) {
