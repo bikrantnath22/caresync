@@ -74,13 +74,37 @@ export default async function handler(req, res) {
       });
     }
 
-    const googleUrl = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey}`;
+    let googleUrl = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey}`;
 
-    const googleResponse = await fetch(googleUrl, {
+    let googleResponse = await fetch(googleUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: payloadString,
     });
+
+    // If targetModel returned 404 (e.g. experimental or preview model name), fallback to gemini-2.0-flash then gemini-1.5-flash
+    if (googleResponse.status === 404 && targetModel !== "gemini-2.0-flash") {
+      const fallback20Url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+      const fallback20Resp = await fetch(fallback20Url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payloadString,
+      });
+
+      if (fallback20Resp.ok || fallback20Resp.status !== 404) {
+        googleResponse = fallback20Resp;
+      } else {
+        const fallback15Url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const fallback15Resp = await fetch(fallback15Url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payloadString,
+        });
+        if (fallback15Resp.ok || fallback15Resp.status !== 404) {
+          googleResponse = fallback15Resp;
+        }
+      }
+    }
 
     const data = await googleResponse.json();
     return res.status(googleResponse.status).json(data);

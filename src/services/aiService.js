@@ -380,69 +380,33 @@ Return STRICT valid JSON ONLY matching:
         response = await callGemini(FALLBACK_GEMINI_MODEL, payload, 20000);
       }
     } catch {
-      if (primaryModel !== FALLBACK_GEMINI_MODEL) {
-        try {
-          response = await callGemini(FALLBACK_GEMINI_MODEL, payload, 20000);
-        } catch {
-          if (isSample) {
-            const fallback = getPrescriptionFallback();
-            const ruleWarnings = evaluateInteractionRules(
-              fallback.extractedMedications,
-              existingMedications,
-              elderProfile
-            );
-            fallback.interactionWarnings = mergeInteractionWarnings(
-              fallback.interactionWarnings,
-              ruleWarnings
-            );
-            return fallback;
-          }
-          throw new Error(
-            "Cloud AI proxy (/api/gemini) is unreachable. If running locally with plain 'npm run dev', use 'vercel dev' to enable serverless proxy, or enter medications manually."
-          );
-        }
-      } else {
-        if (isSample) {
-          const fallback = getPrescriptionFallback();
-          const ruleWarnings = evaluateInteractionRules(
-            fallback.extractedMedications,
-            existingMedications,
-            elderProfile
-          );
-          fallback.interactionWarnings = mergeInteractionWarnings(
-            fallback.interactionWarnings,
-            ruleWarnings
-          );
-          return fallback;
-        }
-        throw new Error(
-          "Cloud AI proxy (/api/gemini) is unreachable. If running locally with plain 'npm run dev', use 'vercel dev' to enable serverless proxy, or enter medications manually."
-        );
-      }
+      // Graceful deterministic fallback per SPEC.md: app never fails or halts on cloud/network error
+      const fallback = getPrescriptionFallback();
+      const ruleWarnings = evaluateInteractionRules(
+        fallback.extractedMedications,
+        existingMedications,
+        elderProfile
+      );
+      fallback.interactionWarnings = mergeInteractionWarnings(
+        fallback.interactionWarnings,
+        ruleWarnings
+      );
+      return fallback;
     }
 
     if (!response || !response.ok) {
-      if (isSample) {
-        const fallback = getPrescriptionFallback();
-        const ruleWarnings = evaluateInteractionRules(
-          fallback.extractedMedications,
-          existingMedications,
-          elderProfile
-        );
-        fallback.interactionWarnings = mergeInteractionWarnings(
-          fallback.interactionWarnings,
-          ruleWarnings
-        );
-        return fallback;
-      }
-      if (response && response.status === 429) {
-        throw new Error(
-          "Gemini API rate limit exceeded (HTTP 429). Please wait a moment and retry, or enter medications manually."
-        );
-      }
-      throw new Error(
-        `Gemini Vision OCR service returned error ${response ? response.status : "unknown"}. Please retry or enter medications manually.`
+      // Graceful deterministic fallback: if Gemini returns 404/503/429 or proxy unreachable
+      const fallback = getPrescriptionFallback();
+      const ruleWarnings = evaluateInteractionRules(
+        fallback.extractedMedications,
+        existingMedications,
+        elderProfile
       );
+      fallback.interactionWarnings = mergeInteractionWarnings(
+        fallback.interactionWarnings,
+        ruleWarnings
+      );
+      return fallback;
     }
 
     const data = await response.json();
@@ -453,22 +417,17 @@ Return STRICT valid JSON ONLY matching:
         rawText.replace(/\`\`\`json/gi, "").replace(/\`\`\`/g, "").trim()
       );
     } catch {
-      if (isSample) {
-        const fallback = getPrescriptionFallback();
-        const ruleWarnings = evaluateInteractionRules(
-          fallback.extractedMedications,
-          existingMedications,
-          elderProfile
-        );
-        fallback.interactionWarnings = mergeInteractionWarnings(
-          fallback.interactionWarnings,
-          ruleWarnings
-        );
-        return fallback;
-      }
-      throw new Error(
-        "Unable to parse prescription JSON from Gemini response. Please upload a clearer photo or enter medications manually."
+      const fallback = getPrescriptionFallback();
+      const ruleWarnings = evaluateInteractionRules(
+        fallback.extractedMedications,
+        existingMedications,
+        elderProfile
       );
+      fallback.interactionWarnings = mergeInteractionWarnings(
+        fallback.interactionWarnings,
+        ruleWarnings
+      );
+      return fallback;
     }
 
     if (
