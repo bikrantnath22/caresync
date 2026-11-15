@@ -21,9 +21,14 @@ import {
   Image as ImageIcon,
   Trash2,
   Info,
+  Cloud,
 } from "lucide-react";
 import { useCare } from "../context/CareContext";
-import { validatePrescriptionFile } from "../utils/security";
+import {
+  validatePrescriptionFile,
+  getStoredConsent,
+  setStoredConsent,
+} from "../utils/security";
 import { parsePrescriptionAndCheckInteractions } from "../services/aiService";
 import { INTERACTION_DISCLAIMER } from "../utils/interactionRules";
 
@@ -106,6 +111,11 @@ export default function PrescriptionUploader({ onSyncComplete }) {
       setSelectedFile(null);
       setImagePreviewUrl(null);
       return;
+    }
+
+    // Auto-grant cloud consent for this intentional user file upload if not explicitly declined
+    if (getStoredConsent() !== "declined") {
+      setStoredConsent("granted");
     }
 
     setSelectedFile(file);
@@ -340,15 +350,35 @@ export default function PrescriptionUploader({ onSyncComplete }) {
             <ShieldAlert className="w-5 h-5 text-red-400 shrink-0" aria-hidden="true" />
             <span className="font-semibold">{validationError}</span>
           </div>
-          <button
-            id="btn-retry-upload"
-            type="button"
-            aria-label="Clear & Retry, reset prescription upload"
-            onClick={handleReset}
-            className="px-3 py-1.5 rounded-lg bg-red-900/80 hover:bg-red-800 text-white text-xs font-bold self-start sm:self-auto transition"
-          >
-            Clear & Retry
-          </button>
+          <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+            {validationError.includes("Cloud AI consent") && (
+              <button
+                id="btn-enable-cloud-consent"
+                type="button"
+                aria-label="Enable Cloud AI Now, grant cloud AI consent"
+                onClick={() => {
+                  setStoredConsent("granted");
+                  setValidationError("");
+                  if (selectedFile) {
+                    handleProcessFile(selectedFile);
+                  }
+                }}
+                className="px-3.5 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-white text-xs font-bold transition shadow-sm flex items-center gap-1.5"
+              >
+                <Cloud className="w-4 h-4" aria-hidden="true" />
+                Enable Cloud AI Now
+              </button>
+            )}
+            <button
+              id="btn-retry-upload"
+              type="button"
+              aria-label="Clear & Retry, reset prescription upload"
+              onClick={handleReset}
+              className="px-3 py-1.5 rounded-lg bg-red-900/80 hover:bg-red-800 text-white text-xs font-bold transition"
+            >
+              Clear & Retry
+            </button>
+          </div>
         </div>
       )}
 
