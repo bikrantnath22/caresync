@@ -20,11 +20,11 @@ import { hasCloudConsent } from "../utils/security.js";
  * models page (e.g. gemini-2.5-flash or gemini-2.0-flash). Re-check model availability
  * periodically at https://ai.google.dev/models.
  */
-const DEFAULT_GEMINI_MODEL = "gemini-2.0-flash";
-const FALLBACK_GEMINI_MODEL = "gemini-1.5-flash";
+const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash";
+const FALLBACK_GEMINI_MODEL = "gemini-2.5-flash";
 
 /**
- * Safely retrieves Gemini model name (defaults to current stable gemini-2.0-flash).
+ * Safely retrieves Gemini model name (defaults to gemini-3.5-flash).
  * @returns {string}
  */
 function getGeminiModel() {

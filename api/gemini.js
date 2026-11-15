@@ -49,17 +49,13 @@ export default async function handler(req, res) {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
     const { model, payload } = body || {};
 
-    // Validate target model against allow-list or fallback to stable gemini-2.0-flash
+    // Use requested model (e.g. gemini-3.5-flash) or environment preference
     let targetModel = (
       model ||
       process.env.GEMINI_MODEL ||
       process.env.VITE_GEMINI_MODEL ||
-      "gemini-2.0-flash"
-    ).trim();
-
-    if (!ALLOWED_MODELS.has(targetModel)) {
-      targetModel = "gemini-2.0-flash";
-    }
+      "gemini-3.5-flash"
+    ).trim().replace(/^models\//, "");
 
     if (!payload || typeof payload !== "object") {
       return res.status(400).json({
@@ -82,27 +78,43 @@ export default async function handler(req, res) {
       body: payloadString,
     });
 
-    // If targetModel returned 404 (e.g. experimental or preview model name), fallback to gemini-2.0-flash then gemini-1.5-flash
-    if (googleResponse.status === 404 && targetModel !== "gemini-2.0-flash") {
-      const fallback20Url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-      const fallback20Resp = await fetch(fallback20Url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: payloadString,
-      });
+    // If targetModel returned 404, dynamically query ListModels to find the user's active supported Flash model
+    if (googleResponse.status === 404) {
+      try {
+        const listResp = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
+        );
+        if (listResp.ok) {
+          const listData = await listResp.json();
+          const availableModels = (listData.models || []).filter(
+            (m) =>
+              Array.isArray(m.supportedGenerationMethods) &&
+              m.supportedGenerationMethods.includes("generateContent")
+          );
 
-      if (fallback20Resp.ok || fallback20Resp.status !== 404) {
-        googleResponse = fallback20Resp;
-      } else {
-        const fallback15Url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-        const fallback15Resp = await fetch(fallback15Url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: payloadString,
-        });
-        if (fallback15Resp.ok || fallback15Resp.status !== 404) {
-          googleResponse = fallback15Resp;
+          // Find the best matching model available on this API key
+          const matchedModel =
+            availableModels.find((m) => m.name.includes("3.5-flash")) ||
+            availableModels.find((m) => m.name.includes("2.5-flash")) ||
+            availableModels.find((m) => m.name.includes("2.0-flash")) ||
+            availableModels.find((m) => m.name.includes("flash")) ||
+            availableModels[0];
+
+          if (matchedModel && matchedModel.name) {
+            const cleanModelName = matchedModel.name.replace(/^models\//, "");
+            const retryUrl = `https://generativelanguage.googleapis.com/v1beta/models/${cleanModelName}:generateContent?key=${apiKey}`;
+            const retryResp = await fetch(retryUrl, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: payloadString,
+            });
+            if (retryResp.ok || retryResp.status !== 404) {
+              googleResponse = retryResp;
+            }
+          }
         }
+      } catch {
+        // Fallback gracefully
       }
     }
 
