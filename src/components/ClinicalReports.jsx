@@ -381,12 +381,13 @@ export default function ClinicalReports() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="doctor-brief-modal-title"
-          className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
+          className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm p-3 sm:p-6"
         >
-          <div
-            ref={printModalRef}
-            className="w-full max-w-4xl bg-slate-900 rounded-3xl border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
-          >
+          <div className="min-h-full flex justify-center py-4 sm:py-6">
+            <div
+              ref={printModalRef}
+              className="my-auto w-full max-w-4xl bg-slate-900 rounded-3xl border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)]"
+            >
             {/* Modal Interactive Header (Hidden on Print) */}
             <header className="p-4 sm:p-5 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-3 no-print">
               <div className="flex items-center gap-2.5">
@@ -660,6 +661,7 @@ export default function ClinicalReports() {
             </div>
           </div>
         </div>
+      </div>
       )}
     </div>
   );

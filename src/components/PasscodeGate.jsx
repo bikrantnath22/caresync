@@ -197,14 +197,14 @@ export default function PasscodeGate({ isOpen, onClose }) {
       aria-labelledby="passcode-modal-title"
       className="fixed inset-0 z-[9999] overflow-y-auto bg-black/85 backdrop-blur-md p-3 sm:p-4"
     >
-      <div className="min-h-full flex items-center justify-center py-2 sm:py-6">
+      <div className="min-h-full flex justify-center py-3 sm:py-6">
         <div
           ref={modalRef}
           tabIndex={-1}
-          className="bg-slate-900 border-2 border-sky-500/50 rounded-2xl p-5 sm:p-6 max-w-sm sm:max-w-md w-full shadow-[0_0_50px_rgba(0,0,0,0.8)] relative text-white my-auto max-h-[92vh] overflow-y-auto flex flex-col focus:outline-none"
+          className="bg-slate-900 border-2 border-sky-500/50 rounded-2xl p-5 sm:p-6 max-w-sm sm:max-w-md w-full shadow-[0_0_50px_rgba(0,0,0,0.8)] relative text-white my-auto max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-y-auto flex flex-col focus:outline-none"
         >
-          {/* Header Row with Close Button */}
-          <div className="flex items-center justify-between gap-3 mb-3 pb-2 border-b border-slate-800">
+          {/* Header Row with Close Button - shrink-0 ensures top is never cropped */}
+          <div className="shrink-0 flex items-center justify-between gap-3 mb-3 pb-2 border-b border-slate-800">
             <div className="flex items-center gap-2.5">
               <div className="p-2 bg-sky-500/20 text-sky-400 rounded-lg">
                 <Lock className="w-5 h-5" aria-hidden="true" />

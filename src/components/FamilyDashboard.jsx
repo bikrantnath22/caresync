@@ -914,9 +914,10 @@ export default function FamilyDashboard() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="med-modal-title"
-          className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
+          className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-3 sm:p-6"
         >
-          <div className="w-full max-w-xl bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col">
+          <div className="min-h-full flex justify-center py-4 sm:py-6">
+            <div className="my-auto w-full max-w-xl bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col">
             <header className="p-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 bg-purple-100 text-purple-700 rounded-xl border border-purple-200">
@@ -1120,6 +1121,7 @@ export default function FamilyDashboard() {
             </form>
           </div>
         </div>
+      </div>
       )}
 
       {/* ========================================================================= */}
@@ -1130,9 +1132,10 @@ export default function FamilyDashboard() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="apt-modal-title"
-          className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6"
+          className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-3 sm:p-6"
         >
-          <div className="w-full max-w-lg bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col">
+          <div className="min-h-full flex justify-center py-4 sm:py-6">
+            <div className="my-auto w-full max-w-lg bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col">
             <header className="p-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 bg-indigo-100 text-indigo-700 rounded-xl border border-indigo-200">
@@ -1286,6 +1289,7 @@ export default function FamilyDashboard() {
             </form>
           </div>
         </div>
+      </div>
       )}
     </div>
   );

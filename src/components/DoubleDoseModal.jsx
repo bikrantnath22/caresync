@@ -7,6 +7,7 @@
  */
 
 import React, { useCallback, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { ShieldAlert, Volume2, X } from "lucide-react";
 import { useCare } from "../context/CareContext";
 
@@ -101,94 +102,100 @@ export default function DoubleDoseModal() {
 
   const patientName = elderProfile?.name || "Patient";
 
-  return (
+  const modalMarkup = (
     <div
       role="alert"
       aria-live="assertive"
       aria-label="Double-Dose Overdose Lockout Alert Modal"
-      className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-bounce-short"
+      className="fixed inset-0 z-[10000] overflow-y-auto bg-black/90 backdrop-blur-md p-3 sm:p-4 animate-fade-in"
     >
-      <div
-        ref={modalRef}
-        tabIndex={-1}
-        className="bg-red-950 border-4 border-red-500 rounded-3xl p-6 sm:p-10 max-w-xl w-full text-center shadow-[0_0_80px_rgba(239,68,68,0.9)] text-white relative focus:outline-none"
-      >
-        {/* Top Close / Dismiss Icon Button */}
-        <button
-          id="btn-modal-close-lockout-icon"
-          type="button"
-          aria-label="Close overdose lockout modal"
-          onClick={clearDoubleDoseAlert}
-          className="absolute top-4 right-4 p-2 text-red-300 hover:text-white rounded-xl bg-red-900/60 hover:bg-red-800 transition"
+      <div className="min-h-full flex justify-center py-4 sm:py-6">
+        <div
+          ref={modalRef}
+          tabIndex={-1}
+          className="my-auto max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-y-auto bg-red-950 border-4 border-red-500 rounded-3xl p-6 sm:p-10 max-w-xl w-full text-center shadow-[0_0_80px_rgba(239,68,68,0.9)] text-white relative focus:outline-none flex flex-col"
         >
-          <X className="w-5 h-5" aria-hidden="true" />
-        </button>
-
-        {/* Pulsing Shield Icon */}
-        <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-5 bg-red-600 text-white rounded-3xl flex items-center justify-center border-4 border-white animate-pulse shadow-xl">
-          <ShieldAlert className="w-12 h-12 sm:w-16 sm:h-16" aria-hidden="true" />
-        </div>
-
-        <span className="px-4 py-1.5 rounded-full bg-red-600 text-white text-xs font-black uppercase tracking-widest inline-block mb-3">
-          Safety Lockout Engaged
-        </span>
-
-        <h2 className="text-2xl sm:text-4xl font-black mb-3 tracking-tight text-white">
-          STOP! DO NOT TAKE ANOTHER PILL
-        </h2>
-
-        <p className="text-lg sm:text-2xl font-bold text-red-100 mb-6 leading-snug">
-          {patientName}, you already took{" "}
-          <strong className="text-white underline decoration-amber-300">
-            {doubleDoseAlert.medicationName} {doubleDoseAlert.dosage}
-          </strong>{" "}
-          earlier today at{" "}
-          <span className="text-amber-300 font-mono">
-            {doubleDoseAlert.lastTakenAt}
-          </span>
-          . Taking a second dose is unsafe.
-        </p>
-
-        {/* Emergency Protocol Box */}
-        <div className="bg-black/60 rounded-2xl p-4 mb-6 text-left text-xs sm:text-sm font-medium border border-red-500/40 space-y-2">
-          <div className="flex justify-between py-1 border-b border-white/10">
-            <span className="text-slate-300">Attempted At:</span>
-            <span className="font-bold text-amber-300 font-mono">
-              {doubleDoseAlert.triggeredAt}
-            </span>
-          </div>
-          <div className="flex justify-between py-1">
-            <span className="text-slate-300">Emergency Protocol:</span>
-            <span className="font-bold text-emerald-400">
-              Stage 3 Emergency Alert Dispatched to Caretaker & Family
-            </span>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3">
+          {/* Top Close / Dismiss Icon Button */}
           <button
-            id="btn-modal-speak-lockout"
+            id="btn-modal-close-lockout-icon"
             type="button"
-            aria-label="Read Aloud, speak clinical overdose warning"
-            onClick={handleSpeakWarning}
-            className="py-3.5 px-5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl border border-red-500/50 flex items-center justify-center gap-2 text-sm sm:text-base transition active:scale-95"
-          >
-            <Volume2 className="w-5 h-5 text-amber-300" aria-hidden="true" />
-            Read Aloud
-          </button>
-
-          <button
-            id="btn-modal-dismiss-lockout"
-            type="button"
-            aria-label="I Understand — Dismiss, acknowledge overdose lockout"
+            aria-label="Close overdose lockout modal"
             onClick={clearDoubleDoseAlert}
-            className="flex-1 py-3.5 px-6 bg-white hover:bg-slate-100 text-red-950 text-base sm:text-xl font-black rounded-2xl shadow-2xl transition active:scale-95"
+            className="absolute top-4 right-4 p-2 text-red-300 hover:text-white rounded-xl bg-red-900/60 hover:bg-red-800 transition"
           >
-            I Understand — Dismiss
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
+
+          {/* Pulsing Shield Icon - shrink-0 */}
+          <div className="shrink-0 w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-5 bg-red-600 text-white rounded-3xl flex items-center justify-center border-4 border-white animate-pulse shadow-xl">
+            <ShieldAlert className="w-12 h-12 sm:w-16 sm:h-16" aria-hidden="true" />
+          </div>
+
+          <span className="shrink-0 px-4 py-1.5 rounded-full bg-red-600 text-white text-xs font-black uppercase tracking-widest inline-block mb-3 mx-auto">
+            Safety Lockout Engaged
+          </span>
+
+          <h2 className="shrink-0 text-2xl sm:text-4xl font-black mb-3 tracking-tight text-white">
+            STOP! DO NOT TAKE ANOTHER PILL
+          </h2>
+
+          <p className="text-lg sm:text-2xl font-bold text-red-100 mb-6 leading-snug">
+            {patientName}, you already took{" "}
+            <strong className="text-white underline decoration-amber-300">
+              {doubleDoseAlert.medicationName} {doubleDoseAlert.dosage}
+            </strong>{" "}
+            earlier today at{" "}
+            <span className="text-amber-300 font-mono">
+              {doubleDoseAlert.lastTakenAt}
+            </span>
+            . Taking a second dose is unsafe.
+          </p>
+
+          {/* Emergency Protocol Box */}
+          <div className="bg-black/60 rounded-2xl p-4 mb-6 text-left text-xs sm:text-sm font-medium border border-red-500/40 space-y-2">
+            <div className="flex justify-between py-1 border-b border-white/10">
+              <span className="text-slate-300">Attempted At:</span>
+              <span className="font-bold text-amber-300 font-mono">
+                {doubleDoseAlert.triggeredAt}
+              </span>
+            </div>
+            <div className="flex justify-between py-1">
+              <span className="text-slate-300">Emergency Protocol:</span>
+              <span className="font-bold text-emerald-400">
+                Stage 3 Emergency Alert Dispatched to Caretaker & Family
+              </span>
+            </div>
+          </div>
+
+          {/* Action Buttons - shrink-0 */}
+          <div className="shrink-0 flex flex-col sm:flex-row gap-3 pt-2">
+            <button
+              id="btn-modal-speak-lockout"
+              type="button"
+              aria-label="Read Aloud, speak clinical overdose warning"
+              onClick={handleSpeakWarning}
+              className="py-3.5 px-5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-2xl border border-red-500/50 flex items-center justify-center gap-2 text-sm sm:text-base transition active:scale-95"
+            >
+              <Volume2 className="w-5 h-5 text-amber-300" aria-hidden="true" />
+              Read Aloud
+            </button>
+
+            <button
+              id="btn-modal-dismiss-lockout"
+              type="button"
+              aria-label="I Understand — Dismiss, acknowledge overdose lockout"
+              onClick={clearDoubleDoseAlert}
+              className="flex-1 py-3.5 px-6 bg-white hover:bg-slate-100 text-red-950 text-base sm:text-xl font-black rounded-2xl shadow-2xl transition active:scale-95"
+            >
+              I Understand — Dismiss
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
+
+  return typeof document !== "undefined"
+    ? createPortal(modalMarkup, document.body)
+    : modalMarkup;
 }

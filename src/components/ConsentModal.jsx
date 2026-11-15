@@ -128,14 +128,14 @@ export default function ConsentModal({
       aria-describedby="consent-modal-desc"
       className="fixed inset-0 z-[9999] overflow-y-auto bg-black/85 backdrop-blur-md p-3 sm:p-4"
     >
-      <div className="min-h-full flex items-center justify-center py-4 sm:py-6">
+      <div className="min-h-full flex justify-center py-4 sm:py-6">
         <div
           ref={modalRef}
           tabIndex={-1}
-          className="bg-slate-900 border-2 border-sky-500/50 rounded-2xl p-5 sm:p-6 max-w-lg w-full shadow-[0_0_60px_rgba(0,0,0,0.85)] relative text-white my-auto max-h-[92vh] overflow-y-auto flex flex-col focus:outline-none"
+          className="bg-slate-900 border-2 border-sky-500/50 rounded-2xl p-5 sm:p-6 max-w-lg w-full shadow-[0_0_60px_rgba(0,0,0,0.85)] relative text-white my-auto max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-3rem)] overflow-y-auto flex flex-col focus:outline-none"
         >
-          {/* Header Row */}
-          <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-800">
+          {/* Header Row - shrink-0 ensures top is never cropped */}
+          <div className="shrink-0 flex items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-800">
             <div className="flex items-center gap-3">
               <div className="p-2.5 bg-gradient-to-tr from-sky-500 to-indigo-600 text-white rounded-xl shadow-md shadow-sky-500/20">
                 <Cloud className="w-6 h-6" aria-hidden="true" />

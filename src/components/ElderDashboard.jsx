@@ -1879,47 +1879,49 @@ export default function ElderDashboard() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="sos-confirm-title"
-          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-3 sm:p-6 animate-fade-in"
         >
-          <div className="bg-white border-2 border-rose-300 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl text-center">
-            <div className="w-20 h-20 bg-rose-50 text-rose-600 border-2 border-rose-200 rounded-full flex items-center justify-center mx-auto shadow-sm">
-              <ShieldAlert className="w-12 h-12" aria-hidden="true" />
-            </div>
-            <div className="space-y-2">
-              <h2
-                id="sos-confirm-title"
-                className="text-3xl sm:text-4xl font-black text-slate-900"
-              >
-                Emergency SOS Alert?
-              </h2>
-              <p className="text-xl sm:text-2xl text-rose-700 font-bold" lang="hi">
-                क्या आप आपातकालीन सहायता भेजना चाहते हैं?
-              </p>
-              <p className="text-lg text-slate-600 font-medium pt-2">
-                This will immediately send a <strong className="text-rose-700 font-bold">CRITICAL STAGE 3 EMAIL</strong> to your family ({elderProfile.familyEmail}) and caretaker ({elderProfile.caretakerEmail}), and display direct emergency calling for <strong>112</strong> and <strong>102</strong>.
-              </p>
-            </div>
+          <div className="min-h-full flex justify-center py-4 sm:py-6">
+            <div className="my-auto bg-white border-2 border-rose-300 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl text-center">
+              <div className="w-20 h-20 bg-rose-50 text-rose-600 border-2 border-rose-200 rounded-full flex items-center justify-center mx-auto shadow-sm">
+                <ShieldAlert className="w-12 h-12" aria-hidden="true" />
+              </div>
+              <div className="space-y-2">
+                <h2
+                  id="sos-confirm-title"
+                  className="text-3xl sm:text-4xl font-black text-slate-900"
+                >
+                  Emergency SOS Alert?
+                </h2>
+                <p className="text-xl sm:text-2xl text-rose-700 font-bold" lang="hi">
+                  क्या आप आपातकालीन सहायता भेजना चाहते हैं?
+                </p>
+                <p className="text-lg text-slate-600 font-medium pt-2">
+                  This will immediately send a <strong className="text-rose-700 font-bold">CRITICAL STAGE 3 EMAIL</strong> to your family ({elderProfile.familyEmail}) and caretaker ({elderProfile.caretakerEmail}), and display direct emergency calling for <strong>112</strong> and <strong>102</strong>.
+                </p>
+              </div>
 
-            <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
-              <button
-                id="btn-confirm-sos"
-                type="button"
-                aria-label="Yes, Send Emergency SOS, trigger critical emergency alert"
-                onClick={handleConfirmSos}
-                className="w-full sm:flex-1 py-4 px-6 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xl shadow-lg shadow-rose-600/30 transition active:scale-98 flex items-center justify-center gap-2"
-              >
-                <PhoneCall className="w-6 h-6" aria-hidden="true" />
-                <span>Yes, Send Emergency SOS</span>
-              </button>
-              <button
-                id="btn-cancel-sos"
-                type="button"
-                aria-label="No, Cancel, cancel emergency alert"
-                onClick={() => setShowSosConfirm(false)}
-                className="w-full sm:flex-1 py-4 px-6 rounded-2xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-lg sm:text-xl border border-slate-300 transition active:scale-98 shadow-sm"
-              >
-                No, Cancel
-              </button>
+              <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
+                <button
+                  id="btn-confirm-sos"
+                  type="button"
+                  aria-label="Yes, Send Emergency SOS, trigger critical emergency alert"
+                  onClick={handleConfirmSos}
+                  className="w-full sm:flex-1 py-4 px-6 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xl shadow-lg shadow-rose-600/30 transition active:scale-98 flex items-center justify-center gap-2"
+                >
+                  <PhoneCall className="w-6 h-6" aria-hidden="true" />
+                  <span>Yes, Send Emergency SOS</span>
+                </button>
+                <button
+                  id="btn-cancel-sos"
+                  type="button"
+                  aria-label="No, Cancel, cancel emergency alert"
+                  onClick={() => setShowSosConfirm(false)}
+                  className="w-full sm:flex-1 py-4 px-6 rounded-2xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-lg sm:text-xl border border-slate-300 transition active:scale-98 shadow-sm"
+                >
+                  No, Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1931,69 +1933,71 @@ export default function ElderDashboard() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="skip-modal-title"
-          className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-3 sm:p-6 animate-fade-in"
         >
-          <div className="bg-white border-2 border-amber-300 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl">
-            <div className="space-y-2 text-center">
-              <div className="w-16 h-16 bg-amber-50 text-amber-600 border border-amber-200 rounded-full flex items-center justify-center mx-auto shadow-sm">
-                <AlertTriangle className="w-9 h-9" aria-hidden="true" />
+          <div className="min-h-full flex justify-center py-4 sm:py-6">
+            <div className="my-auto bg-white border-2 border-amber-300 rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 shadow-2xl">
+              <div className="space-y-2 text-center">
+                <div className="w-16 h-16 bg-amber-50 text-amber-600 border border-amber-200 rounded-full flex items-center justify-center mx-auto shadow-sm">
+                  <AlertTriangle className="w-9 h-9" aria-hidden="true" />
+                </div>
+                <h2 id="skip-modal-title" className="text-2xl sm:text-3xl font-black text-slate-900">
+                  Skip {skipTarget.med.name} ({skipTarget.slot})?
+                </h2>
+                <p className="text-lg sm:text-xl text-slate-800 font-bold" lang="hi">
+                  दवा छोड़ने का कारण चुनें:
+                </p>
+                <p className="text-base text-slate-600">
+                  Please select a clinical reason. Caretaker will be notified at normal priority and pending missed alerts will be cancelled.
+                </p>
               </div>
-              <h2 id="skip-modal-title" className="text-2xl sm:text-3xl font-black text-slate-900">
-                Skip {skipTarget.med.name} ({skipTarget.slot})?
-              </h2>
-              <p className="text-lg sm:text-xl text-slate-800 font-bold" lang="hi">
-                दवा छोड़ने का कारण चुनें:
-              </p>
-              <p className="text-base text-slate-600">
-                Please select a clinical reason. Caretaker will be notified at normal priority and pending missed alerts will be cancelled.
-              </p>
-            </div>
 
-            <div className="flex flex-col gap-3">
-              <button
-                id="btn-skip-reason-unwell"
-                type="button"
-                aria-label="Felt unwell, select reason felt unwell"
-                onClick={() => handleConfirmSkip("Felt unwell")}
-                className="w-full py-4 px-5 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300 font-black text-xl transition active:scale-98 text-left flex items-center justify-between shadow-sm"
-              >
-                <span>Felt unwell</span>
-                <span className="text-base font-bold text-amber-700" lang="hi">(तबीयत ठीक नहीं लगी)</span>
-              </button>
+              <div className="flex flex-col gap-3">
+                <button
+                  id="btn-skip-reason-unwell"
+                  type="button"
+                  aria-label="Felt unwell, select reason felt unwell"
+                  onClick={() => handleConfirmSkip("Felt unwell")}
+                  className="w-full py-4 px-5 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300 font-black text-xl transition active:scale-98 text-left flex items-center justify-between shadow-sm"
+                >
+                  <span>Felt unwell</span>
+                  <span className="text-base font-bold text-amber-700" lang="hi">(तबीयत ठीक नहीं लगी)</span>
+                </button>
 
-              <button
-                id="btn-skip-reason-ranout"
-                type="button"
-                aria-label="Ran out of medicine, select reason ran out of medicine"
-                onClick={() => handleConfirmSkip("Ran out of medicine")}
-                className="w-full py-4 px-5 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-black text-xl transition active:scale-98 text-left flex items-center justify-between shadow-sm"
-              >
-                <span>Ran out of medicine</span>
-                <span className="text-base font-bold text-slate-500" lang="hi">(दवा खत्म हो गई)</span>
-              </button>
+                <button
+                  id="btn-skip-reason-ranout"
+                  type="button"
+                  aria-label="Ran out of medicine, select reason ran out of medicine"
+                  onClick={() => handleConfirmSkip("Ran out of medicine")}
+                  className="w-full py-4 px-5 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 font-black text-xl transition active:scale-98 text-left flex items-center justify-between shadow-sm"
+                >
+                  <span>Ran out of medicine</span>
+                  <span className="text-base font-bold text-slate-500" lang="hi">(दवा खत्म हो गई)</span>
+                </button>
 
-              <button
-                id="btn-skip-reason-doctor"
-                type="button"
-                aria-label="Doctor said so, select reason doctor advised to skip"
-                onClick={() => handleConfirmSkip("Doctor said so")}
-                className="w-full py-4 px-5 rounded-2xl bg-blue-50 hover:bg-blue-100 text-blue-950 border border-blue-200 font-black text-xl transition active:scale-98 text-left flex items-center justify-between shadow-sm"
-              >
-                <span>Doctor said so</span>
-                <span className="text-base font-bold text-blue-700" lang="hi">(डॉक्टर ने मना किया)</span>
-              </button>
-            </div>
+                <button
+                  id="btn-skip-reason-doctor"
+                  type="button"
+                  aria-label="Doctor said so, select reason doctor advised to skip"
+                  onClick={() => handleConfirmSkip("Doctor said so")}
+                  className="w-full py-4 px-5 rounded-2xl bg-blue-50 hover:bg-blue-100 text-blue-950 border border-blue-200 font-black text-xl transition active:scale-98 text-left flex items-center justify-between shadow-sm"
+                >
+                  <span>Doctor said so</span>
+                  <span className="text-base font-bold text-blue-700" lang="hi">(डॉक्टर ने मना किया)</span>
+                </button>
+              </div>
 
-            <div className="pt-2">
-              <button
-                id="btn-cancel-skip-modal"
-                type="button"
-                aria-label="Cancel, keep dose active and close skip dialog"
-                onClick={() => setSkipTarget(null)}
-                className="w-full py-3.5 px-6 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-lg border border-slate-300 transition active:scale-98"
-              >
-                Cancel
-              </button>
+              <div className="pt-2">
+                <button
+                  id="btn-cancel-skip-modal"
+                  type="button"
+                  aria-label="Cancel, keep dose active and close skip dialog"
+                  onClick={() => setSkipTarget(null)}
+                  className="w-full py-3.5 px-6 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-lg border border-slate-300 transition active:scale-98"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
