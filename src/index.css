@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-900 min-h-screen;
+  }
+}
+
+@layer utilities {
+  .border-3 {
+    border-width: 3px;
+  }
+}
+
+/* Light Theme High-contrast WCAG AAA rules for elder accessibility */
+.elder-high-contrast {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border-color: #0284c7 !important;
+}
+
+/* Custom refined light scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Print styling for Clinical Brief & Doctor Reports */
+@media print {
+  @page {
+    size: portrait;
+    margin: 8mm;
+  }
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10.5pt !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .no-print, header, nav, footer:not(.printable-doctor-brief footer) {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .printable-doctor-brief {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}
